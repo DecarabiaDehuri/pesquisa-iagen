@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Pesquisa Acadêmica</title>
+  <!-- Fonte legível e limpa -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <!-- FingerprintJS para identificar dispositivo -->
+  <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px 12px;
+      margin: 0;
+      color: #1e293b;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      padding: 24px 20px;
+      margin: 10px 0;
+    }
+    h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; font-weight: 600; margin: 20px 0 16px; }
+    .subtitulo { color: #64748b; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.4; }
+    .etapa { display: none; }
+    .etapa.ativa { display: block; }
+    .timer {
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 1.2rem;
+    }
+    .estimulo {
+      font-size: 2.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 30px 0 40px;
+      color: #0f172a;
+      word-break: break-word;
+    }
+    .input-palavra {
+      width: 100%;
+      padding: 16px 18px;
+      font-size: 1.1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      background: white;
+      transition: border 0.2s;
+    }
+    .input-palavra:focus {
+      border-color: #4f46e5;
+      outline: none;
+    }
+    .botao {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 18px 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 40px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 24px;
+    }
+    .botao:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+    .botao-secundario {
+      background: white;
+      color: #4f46e5;
+      border: 2px solid #4f46e5;
+      margin-top: 12px;
+    }
+    .palavra-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      padding: 16px 18px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .palavra-texto {
+      font-size: 1.2rem;
+      font-weight: 500;
+      word-break: break-word;
+      padding-right: 10px;
+    }
+    select {
+      padding: 10px 14px;
+      border-radius: 30px;
+      border: 2px solid #e2e8f0;
+      font-size: 1rem;
+      background: white;
+      min-width: 80px;
+      text-align: center;
+    }
+    .polaridade-botoes {
+      display: flex;
+      gap: 10px;
+    }
+    .pol-btn {
+      padding: 10px 18px;
+      border-radius: 30px;
+      border: 2px solid #e2e8f0;
+      background: white;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      transition: all 0.1s;
+    }
+    .pol-btn.selecionado.positivo {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+    .pol-btn.selecionado.negativo {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: white;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #334155;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+      margin-bottom: 0;
+    }
+    input, select {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 1rem;
+      background: white;
+    }
+    .erro-msg {
+      color: #ef4444;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+    .termo {
+      background: #f1f5f9;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .obrigado {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .aviso-duplicata {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+    /* Mobile adjustments */
+    @media (max-width: 400px) {
+      .container { padding: 16px 12px; }
+      .estimulo { font-size: 2.2rem; }
+      .palavra-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .polaridade-botoes { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- Estado Inicial -->
+  <div id="tela-inicial" class="etapa ativa">
+    <h1>Pesquisa Acadêmica</h1>
+    <div class="termo">
+      <strong>Termo de Consentimento</strong><br>
+      Você está sendo convidado(a) a participar de uma pesquisa sobre representações sociais. 
+      Seus dados serão anonimizados e utilizados apenas para fins estatísticos. 
+      Ao clicar em "Iniciar", você concorda em participar voluntariamente.
+    </div>
+    <div class="form-group">
+      <label>Você é:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="papel" value="aluno" checked> Aluno de Graduação</label>
+        <label><input type="radio" name="papel" value="professor"> Professor Universitário</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Faculdade/Instituição *</label>
+      <input type="text" id="faculdade" placeholder="Ex: Universidade de São Paulo" required>
+    </div>
+    <div class="form-group">
+      <label>Curso de Graduação *</label>
+      <input type="text" id="curso" placeholder="Ex: Psicologia" required>
+    </div>
+    <div class="form-group">
+      <label>Idade *</label>
+      <input type="number" id="idade" min="17" max="99" placeholder="22" required>
+    </div>
+    <div class="form-group">
+      <label>Gênero *</label>
+      <select id="genero" required>
+        <option value="">Selecione...</option>
+        <option value="Feminino">Feminino</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Outro">Outro</option>
+        <option value="Prefiro não informar">Prefiro não informar</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label><input type="checkbox" id="consentimento" required> Li e concordo em participar</label>
+    </div>
+    <button class="botao" id="btn-iniciar">Iniciar Questionário</button>
+  </div>
+
+  <!-- Etapa 2: Evocação Livre -->
+  <div id="tela-evocacao" class="etapa">
+    <div class="timer" id="timer-evocacao">01:00</div>
+    <div class="estimulo" id="estimulo-indutor">Escola</div>
+    <p style="margin-bottom:20px; color:#475569;">Escreva as 5 primeiras palavras que vêm à sua mente:</p>
+    <input type="text" class="input-palavra" id="palavra1" placeholder="1ª palavra" maxlength="30">
+    <input type="text" class="input-palavra" id="palavra2" placeholder="2ª palavra" maxlength="30">
+    <input type="text" class="input-palavra" id="palavra3" placeholder="3ª palavra" maxlength="30">
+    <input type="text" class="input-palavra" id="palavra4" placeholder="4ª palavra" maxlength="30">
+    <input type="text" class="input-palavra" id="palavra5" placeholder="5ª palavra" maxlength="30">
+    <button class="botao" id="btn-avancar-evocacao" disabled>Avançar</button>
+  </div>
+
+  <!-- Etapa 3: Hierarquização -->
+  <div id="tela-hierarquia" class="etapa">
+    <div class="timer" id="timer-hierarquia">01:00</div>
+    <h2>Ordene por importância</h2>
+    <p style="margin-bottom:20px; color:#475569;">1 = mais importante, 5 = menos importante</p>
+    <div id="lista-hierarquia"></div>
+    <button class="botao" id="btn-avancar-hierarquia">Avançar</button>
+  </div>
+
+  <!-- Etapa 4: Polaridade -->
+  <div id="tela-polaridade" class="etapa">
+    <div class="timer" id="timer-polaridade">01:00</div>
+    <h2>Avalie cada palavra</h2>
+    <p style="margin-bottom:20px; color:#475569;">Para você, a palavra é positiva ou negativa?</p>
+    <div id="lista-polaridade"></div>
+    <button class="botao" id="btn-finalizar">Enviar Respostas</button>
+  </div>
+
+  <!-- Etapa Final: Agradecimento -->
+  <div id="tela-obrigado" class="etapa">
+    <div class="obrigado">
+      <h2>✨ Obrigado!</h2>
+      <p style="margin: 20px 0;">Sua participação foi registrada com sucesso.</p>
+    </div>
+  </div>
+
+  <!-- Mensagem de erro/duplicata -->
+  <div id="mensagem-erro" style="display:none;"></div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // ---------- CONFIGURAÇÃO (SUBSTITUA AQUI) ----------
+    const SUPABASE_URL = "https://crgngeclhdukmiagkrqx.supabase.co";   // <-- Cole a URL do seu projeto
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZ25nZWNsaGR1a21pYWdrcnF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTUyNzMsImV4cCI6MjA5MjE3MTI3M30.Pz9K358231SBnMVYi1Mh1UXrZhlSQdkfOsG_jEJiX7Q"; // <-- Cole a chave anon/public
+    const EDGE_FUNCTION_URL = "https://crgngeclhdukmiagkrqx.supabase.co/functions/v1/swift-responder";
+    const ESTIMULO = "Inteligência Artificial"; // <-- Mude aqui se quiser outro tema
+    // ----------------------------------------------------
+
+    // Estado global
+    let fingerprint = null;
+    let palavras = ['', '', '', '', ''];
+    let hierarquia = ['', '', '', '', ''];
+    let polaridade = ['', '', '', '', ''];
+    let timerInterval = null;
+    let tempoRestante = 60;
+
+    // Elementos DOM
+    const telas = {
+      inicial: document.getElementById('tela-inicial'),
+      evocacao: document.getElementById('tela-evocacao'),
+      hierarquia: document.getElementById('tela-hierarquia'),
+      polaridade: document.getElementById('tela-polaridade'),
+      obrigado: document.getElementById('tela-obrigado')
+    };
+    const estimuloEl = document.getElementById('estimulo-indutor');
+    estimuloEl.textContent = ESTIMULO;
+
+    // Botões
+    const btnIniciar = document.getElementById('btn-iniciar');
+    const btnAvancarEvocacao = document.getElementById('btn-avancar-evocacao');
+    const btnAvancarHierarquia = document.getElementById('btn-avancar-hierarquia');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+
+    // Inputs
+    const palavraInputs = [
+      document.getElementById('palavra1'),
+      document.getElementById('palavra2'),
+      document.getElementById('palavra3'),
+      document.getElementById('palavra4'),
+      document.getElementById('palavra5')
+    ];
+
+    // Funções de navegação entre etapas
+    function mostrarEtapa(nome) {
+      Object.values(telas).forEach(t => t.classList.remove('ativa'));
+      telas[nome].classList.add('ativa');
+      window.scrollTo(0, 0);
+    }
+
+    // Timer genérico
+    function iniciarTimer(displayEl, duracaoSeg, callbackFim) {
+      if (timerInterval) clearInterval(timerInterval);
+      tempoRestante = duracaoSeg;
+      atualizarDisplayTimer(displayEl, tempoRestante);
+      timerInterval = setInterval(() => {
+        tempoRestante--;
+        atualizarDisplayTimer(displayEl, tempoRestante);
+        if (tempoRestante <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          if (callbackFim) callbackFim();
+        }
+      }, 1000);
+    }
+
+    function atualizarDisplayTimer(el, segundos) {
+      const mins = Math.floor(segundos / 60);
+      const secs = segundos % 60;
+      el.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function pararTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // Validação dos campos da evocação
+    function verificarCamposEvocacao() {
+      const todasPreenchidas = palavraInputs.every(input => input.value.trim() !== '');
+      btnAvancarEvocacao.disabled = !todasPreenchidas;
+    }
+
+    palavraInputs.forEach(input => input.addEventListener('input', verificarCamposEvocacao));
+
+    // Iniciar questionário
+    btnIniciar.addEventListener('click', async function() {
+      // Validar perfil
+      const consentimento = document.getElementById('consentimento').checked;
+      if (!consentimento) {
+        alert('Você deve concordar com o termo para participar.');
+        return;
+      }
+      const faculdade = document.getElementById('faculdade').value.trim();
+      const curso = document.getElementById('curso').value.trim();
+      const idade = document.getElementById('idade').value;
+      const genero = document.getElementById('genero').value;
+      if (!faculdade || !curso || !idade || !genero) {
+        alert('Preencha todos os campos demográficos.');
+        return;
+      }
+      if (idade < 17 || idade > 99) {
+        alert('Idade deve ser entre 17 e 99.');
+        return;
+      }
+
+      // Gerar fingerprint
+      try {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        fingerprint = result.visitorId;
+      } catch (e) {
+        alert('Erro ao verificar dispositivo. Tente novamente.');
+        return;
+      }
+
+      // Guardar dados demográficos no dataset para uso posterior
+      document.getElementById('app').dataset.papel = document.querySelector('input[name="papel"]:checked').value;
+      document.getElementById('app').dataset.faculdade = faculdade;
+      document.getElementById('app').dataset.curso = curso;
+      document.getElementById('app').dataset.idade = idade;
+      document.getElementById('app').dataset.genero = genero;
+
+      mostrarEtapa('evocacao');
+      iniciarTimer(document.getElementById('timer-evocacao'), 60, function() {
+        // Quando o tempo acaba, força avanço
+        if (telas.evocacao.classList.contains('ativa')) {
+          for (let i = 0; i < 5; i++) {
+            if (palavraInputs[i].value.trim() === '') {
+              palavraInputs[i].value = '(sem resposta)';
+            }
+          }
+          avancarParaHierarquia();
+        }
+      });
+    });
+
+    function avancarParaHierarquia() {
+      pararTimer();
+      // Coletar palavras
+      for (let i = 0; i < 5; i++) {
+        palavras[i] = palavraInputs[i].value.trim() || '(vazio)';
+      }
+      // Verificar se há palavras repetidas (opcional)
+      const palavrasUnicas = new Set(palavras.map(p => p.toLowerCase()));
+      if (palavrasUnicas.size < 5) {
+        if (!confirm('Algumas palavras são iguais. Deseja continuar mesmo assim?')) {
+          iniciarTimer(document.getElementById('timer-evocacao'), tempoRestante, () => {});
+          return;
+        }
+      }
+
+      // Construir tela de hierarquia
+      const container = document.getElementById('lista-hierarquia');
+      container.innerHTML = '';
+      const opcoes = ['1', '2', '3', '4', '5'];
+      palavras.forEach((palavra, idx) => {
+        const div = document.createElement('div');
+        div.className = 'palavra-item';
+        div.innerHTML = `
+          <span class="palavra-texto">${palavra}</span>
+          <select data-index="${idx}" class="select-hierarquia">
+            <option value="">--</option>
+            ${opcoes.map(o => `<option value="${o}">${o}</option>`).join('')}
+          </select>
+        `;
+        container.appendChild(div);
+      });
+
+      // Lógica de exclusão mútua nos selects
+      const selects = document.querySelectorAll('.select-hierarquia');
+      function atualizarOpcoesSelects() {
+        const valoresSelecionados = Array.from(selects).map(s => s.value).filter(v => v !== '');
+        selects.forEach(select => {
+          const opcoesSelect = select.querySelectorAll('option');
+          opcoesSelect.forEach(opt => {
+            if (opt.value === '') return;
+            if (valoresSelecionados.includes(opt.value) && select.value !== opt.value) {
+              opt.disabled = true;
+            } else {
+              opt.disabled = false;
+            }
+          });
+        });
+        // Habilita botão se todos tiverem valor
+        const todosPreenchidos = Array.from(selects).every(s => s.value !== '');
+        btnAvancarHierarquia.disabled = !todosPreenchidos;
+      }
+      selects.forEach(s => s.addEventListener('change', atualizarOpcoesSelects));
+      atualizarOpcoesSelects();
+
+      mostrarEtapa('hierarquia');
+      iniciarTimer(document.getElementById('timer-hierarquia'), 60, function() {
+        if (telas.hierarquia.classList.contains('ativa')) {
+          // Preencher com valores padrão
+          selects.forEach((s, i) => { if (!s.value) s.value = (i+1).toString(); });
+          atualizarOpcoesSelects();
+          avancarParaPolaridade();
+        }
+      });
+    }
+
+    btnAvancarEvocacao.addEventListener('click', avancarParaHierarquia);
+
+    function avancarParaPolaridade() {
+      pararTimer();
+      // Coletar hierarquia
+      const selects = document.querySelectorAll('.select-hierarquia');
+      selects.forEach((s, i) => { hierarquia[i] = s.value; });
+
+      // Construir tela de polaridade
+      const container = document.getElementById('lista-polaridade');
+      container.innerHTML = '';
+      palavras.forEach((palavra, idx) => {
+        const div = document.createElement('div');
+        div.className = 'palavra-item';
+        div.innerHTML = `
+          <span class="palavra-texto">${palavra}</span>
+          <div class="polaridade-botoes" data-index="${idx}">
+            <div class="pol-btn positivo" data-val="+">👍 Positivo</div>
+            <div class="pol-btn negativo" data-val="-">👎 Negativo</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      // Event listeners para seleção única por linha
+      document.querySelectorAll('.polaridade-botoes').forEach(grupo => {
+        const botoes = grupo.querySelectorAll('.pol-btn');
+        const idx = grupo.dataset.index;
+        botoes.forEach(btn => {
+          btn.addEventListener('click', function() {
+            botoes.forEach(b => b.classList.remove('selecionado'));
+            this.classList.add('selecionado');
+            polaridade[idx] = this.dataset.val;
+            verificarPolaridadeCompleta();
+          });
+        });
+      });
+
+      function verificarPolaridadeCompleta() {
+        const todasSelecionadas = polaridade.every(v => v === '+' || v === '-');
+        btnFinalizar.disabled = !todasSelecionadas;
+      }
+
+      mostrarEtapa('polaridade');
+      iniciarTimer(document.getElementById('timer-polaridade'), 60, function() {
+        if (telas.polaridade.classList.contains('ativa')) {
+          // Se não escolheu, assume positivo por padrão
+          palavras.forEach((_, i) => {
+            if (!polaridade[i]) {
+              polaridade[i] = '+';
+              const grupo = document.querySelector(`.polaridade-botoes[data-index="${i}"]`);
+              if (grupo) grupo.querySelector('.positivo').classList.add('selecionado');
+            }
+          });
+          finalizarEnvio();
+        }
+      });
+    }
+
+    btnAvancarHierarquia.addEventListener('click', avancarParaPolaridade);
+
+    async function finalizarEnvio() {
+      pararTimer();
+      btnFinalizar.disabled = true;
+      btnFinalizar.textContent = 'Enviando...';
+
+      const appData = document.getElementById('app').dataset;
+      const payload = {
+        fingerprint: fingerprint,
+        ip_hash: 'client-side', // o backend pode capturar IP real ou ignorar
+        papel: appData.papel,
+        faculdade: appData.faculdade,
+        curso: appData.curso,
+        idade: parseInt(appData.idade),
+        genero: appData.genero,
+        palavras: palavras,
+        hierarquia: hierarquia.map(Number),
+        polaridade: polaridade
+      };
+
+      try {
+        const response = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          if (response.status === 409) {
+            alert('Este dispositivo já participou da pesquisa. Obrigado!');
+            mostrarEtapa('obrigado');
+            return;
+          }
+          throw new Error(result.erro || 'Erro no servidor');
+        }
+
+        mostrarEtapa('obrigado');
+      } catch (error) {
+        console.error(error);
+        alert('Ocorreu um erro ao enviar. Por favor, tente novamente.');
+        btnFinalizar.disabled = false;
+        btnFinalizar.textContent = 'Enviar Respostas';
+        iniciarTimer(document.getElementById('timer-polaridade'), tempoRestante, finalizarEnvio);
+      }
+    }
+
+    btnFinalizar.addEventListener('click', finalizarEnvio);
+
+    // Segurança extra: prevenir envio duplo acidental
+    window.addEventListener('beforeunload', function(e) {
+      if (telas.evocacao.classList.contains('ativa') || 
+          telas.hierarquia.classList.contains('ativa') || 
+          telas.polaridade.classList.contains('ativa')) {
+        e.preventDefault();
+        e.returnValue = 'Você tem certeza que deseja sair? Seu progresso será perdido.';
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>
