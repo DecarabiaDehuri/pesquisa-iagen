@@ -407,26 +407,33 @@ Declaro que li e compreendi as informações contidas neste Termo de Consentimen
     }
 
     // Timer genérico
-    function iniciarTimer(displayEl, duracaoSeg, callbackFim) {
-      if (timerInterval) clearInterval(timerInterval);
-      tempoRestante = duracaoSeg;
-      atualizarDisplayTimer(displayEl, tempoRestante);
-      timerInterval = setInterval(() => {
-        tempoRestante--;
-        atualizarDisplayTimer(displayEl, tempoRestante);
-        if (tempoRestante <= 0) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-          if (callbackFim) callbackFim();
-        }
-      }, 1000);
-    }
+	function iniciarTimer(displayEl, duracaoSeg, callbackFim) {
+	  if (timerInterval) clearInterval(timerInterval);
+	  tempoRestante = duracaoSeg;
+	  atualizarDisplayTimer(displayEl, tempoRestante);
+	  
+	  timerInterval = setInterval(() => {
+		tempoRestante--;
+		atualizarDisplayTimer(displayEl, tempoRestante);
+		
+		// Quando chegar a zero ou abaixo, para imediatamente
+		if (tempoRestante <= 0) {
+		  clearInterval(timerInterval);
+		  timerInterval = null;
+		  if (callbackFim) {
+			callbackFim();
+		  }
+		}
+	  }, 1000);
+	}
 
-    function atualizarDisplayTimer(el, segundos) {
-      const mins = Math.floor(segundos / 60);
-      const secs = segundos % 60;
-      el.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
+	function atualizarDisplayTimer(el, segundos) {
+	  // Garante que nunca mostre valores negativos
+	  const segs = Math.max(0, segundos);
+	  const mins = Math.floor(segs / 60);
+	  const secs = segs % 60;
+	  el.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+	}
 
     function pararTimer() {
       if (timerInterval) {
@@ -459,8 +466,8 @@ Declaro que li e compreendi as informações contidas neste Termo de Consentimen
         alert('Preencha todos os campos demográficos.');
         return;
       }
-      if (idade < 17 || idade > 99) {
-        alert('Idade deve ser entre 17 e 99.');
+      if (idade < 18 || idade > 99) {
+        alert('Idade deve ser entre 18 e 99.');
         return;
       }
 
