@@ -407,25 +407,25 @@ Declaro que li e compreendi as informações contidas neste Termo de Consentimen
     }
 
     // Timer genérico
-	function iniciarTimer(displayEl, duracaoSeg, callbackFim) {
-	  if (timerInterval) clearInterval(timerInterval);
-	  tempoRestante = duracaoSeg;
-	  atualizarDisplayTimer(displayEl, tempoRestante);
-	  
-	  timerInterval = setInterval(() => {
-		tempoRestante--;
-		atualizarDisplayTimer(displayEl, tempoRestante);
-		
-		// Quando chegar a zero ou abaixo, para imediatamente
-		if (tempoRestante <= 0) {
-		  clearInterval(timerInterval);
-		  timerInterval = null;
-		  if (callbackFim) {
-			callbackFim();
-		  }
-		}
-	  }, 1000);
-	}
+function iniciarTimer(displayEl, duracaoSeg, callbackFim) {
+  if (timerInterval) clearInterval(timerInterval);
+  tempoRestante = duracaoSeg;
+  atualizarDisplayTimer(displayEl, tempoRestante);
+  
+  timerInterval = setInterval(() => {
+    tempoRestante--;
+    atualizarDisplayTimer(displayEl, tempoRestante);
+    
+    // Quando chegar a zero ou abaixo, para imediatamente
+    if (tempoRestante <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      if (callbackFim) {
+        callbackFim();
+      }
+    }
+  }, 1000);
+}
 
 	function atualizarDisplayTimer(el, segundos) {
 	  // Garante que nunca mostre valores negativos
@@ -509,13 +509,13 @@ Declaro que li e compreendi as informações contidas neste Termo de Consentimen
         palavras[i] = palavraInputs[i].value.trim() || '(vazio)';
       }
       // Verificar se há palavras repetidas (opcional)
-      const palavrasUnicas = new Set(palavras.map(p => p.toLowerCase()));
-      if (palavrasUnicas.size < 5) {
-        if (!confirm('Algumas palavras são iguais. Deseja continuar mesmo assim?')) {
-          iniciarTimer(document.getElementById('timer-evocacao'), tempoRestante, () => {});
-          return;
-        }
-      }
+      //const palavrasUnicas = new Set(palavras.map(p => p.toLowerCase()));
+      //if (palavrasUnicas.size < 5) {
+      //  if (!confirm('Algumas palavras são iguais. Deseja continuar mesmo assim?')) {
+      //    iniciarTimer(document.getElementById('timer-evocacao'), tempoRestante, () => {});
+      //    return;
+      //  }
+      //}
 
       // Construir tela de hierarquia
       const container = document.getElementById('lista-hierarquia');
